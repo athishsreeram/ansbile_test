@@ -1,0 +1,37 @@
+---
+- name: This is a hello-world example
+  hosts: localhost
+  vars_prompt:
+    - name: username
+      prompt: What is your username?
+      private: no
+  tasks:
+    - name: Print a message
+      ansible.builtin.debug:
+        msg: 'Logging in as {{ username }}'
+    - name: Create a file called '/tmp/testfile.txt' with the content 'hello world'.
+      copy:
+        content: hello worldn
+        dest: ./config/testfile.txt
+    - name: Create a file called '/tmp/testfile.txt' with the content 'hello world'.
+      copy:
+        src: ./config/testfile.txt
+        dest: ./target/testfile.txt
+    - name: A jinja2 template
+      template: src='./config/test.j2' dest='./target/test_output_jinja_{{version}}.txt' mode=0755
+    - name: Create a JIRA issue/ POST command
+      register: _result
+      uri:
+        url: https://gorest.co.in/public-api/users
+       #user: your_username
+       #password: your_pass
+        headers:
+          Content-Type: application/json
+          Authorization: "Bearer {{ token_az }}"
+        method: POST
+        body: "{{ lookup('file','./config/data.json') }}"
+        force_basic_auth: yes
+        status_code: 200
+        body_format: json
+    - debug:
+        var: _result    
